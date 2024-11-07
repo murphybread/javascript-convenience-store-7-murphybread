@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 class MarkdownToObjectReader {
-  static product(directoryPath, fileName) {
+  static parseFile(directoryPath, fileName) {
     const items = [];
     const filePath = path.join(directoryPath, fileName);
 
