@@ -29,4 +29,16 @@ describe("StockSystem 클래스", () => {
       }
     });
   });
+
+  test("고객이 상품을 구매할 때마다, 결제된 수량만큼 해당 상품의 재고에서 차감하여 수량을 관리한다.", () => {
+    const userInput = ["goods1", 3];
+    const orderCount = userInput[1];
+    const updatedStock = stockSystem.map((stock) => {
+      if (stock.name === userInput[0] && stock.count >= orderCount) {
+        return { ...stock, count: stock.count - orderCount };
+      }
+      return stock;
+    });
+    expect(updatedStock[0].count).toBe(7);
+  });
 });
