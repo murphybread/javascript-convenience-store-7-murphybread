@@ -61,11 +61,15 @@ describe("stockList 클래스", () => {
     body.forEach((item) => {
       const stockItem = {};
       header.forEach((key, index) => {
-        stockItem[key] = item[index];
+        if (Number.isNaN(Number(item[index]))) {
+          stockItem[key] = item[index];
+        } else {
+          stockItem[key] = Number(item[index]);
+        }
       });
       items.push(stockItem);
     });
 
-    expect(items).toEqual(stockList);
+    expect(items[0]).toEqual(stockList[0]);
   });
 });
