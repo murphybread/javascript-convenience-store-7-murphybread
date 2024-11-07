@@ -6,7 +6,7 @@ class DateUtils {
     return new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
   }
   static getKoreaNowFormatted(koreaDate) {
-    return koreaDate.toLocaleString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\./g, "").replace(/\s/g, "-");
+    return koreaDate.toISOString().split("T")[0];
   }
 }
 
