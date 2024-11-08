@@ -6,8 +6,8 @@ const stockList = [
     name: "콜라",
     price: 1000,
     quantity: 10,
-    promotion: "탄산2+1",
-  },
+    promotion: "탄산2+1"
+  }
 ];
 
 describe("stockList 클래스", () => {

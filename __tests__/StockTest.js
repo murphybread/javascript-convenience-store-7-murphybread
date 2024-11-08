@@ -5,8 +5,8 @@ const stockList = [
     name: "콜라",
     price: 1000,
     quantity: 10,
-    promotion: "탄산 2+1",
-  },
+    promotion: "탄산 2+1"
+  }
 ];
 
 describe("Stock 클래스 테스트", () => {
