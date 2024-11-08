@@ -27,4 +27,14 @@ describe("PromotionSystem 클래스", () => {
     const activePromotions = new PromotionSystem().activePromotions();
     expect(activePromotions).toEqual(["탄산2+1", "MD추천상품", "반짝할인"]);
   });
+
+  test("프로모션 인되는 물품의 name, price, quantity 반환", () => {
+    const userInput = ["콜라", 3];
+    const items = MarkdownToObjectReader.parseFile("products.md");
+    const foundItem = items.filter((item) => item.name === userInput[0]);
+    const promotionItem = items.filter((item) => item.name === userInput[0] && item.promotion !== "null");
+
+    const exampleItem = [{ name: "콜라", price: 1000, quantity: 10, promotion: "탄산2+1" }];
+    expect(promotionItem).toEqual(exampleItem);
+  });
 });
