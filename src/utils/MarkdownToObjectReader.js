@@ -1,10 +1,14 @@
 import fs from "fs";
 import path from "path";
+import { DIRECTORY_PATH } from "../config/constants.js";
 
 class MarkdownToObjectReader {
-  static parseFile(directoryPath, fileName) {
+  static #directoryPath = DIRECTORY_PATH;
+
+  constructor() {}
+  static parseFile(fileName) {
     const items = [];
-    const filePath = path.join(directoryPath, fileName);
+    const filePath = path.join(this.#directoryPath, fileName);
 
     const fileStocklistRaw = fs.readFileSync(filePath, "utf-8");
     const fileStocklist = fileStocklistRaw
