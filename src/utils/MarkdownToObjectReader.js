@@ -34,6 +34,14 @@ class MarkdownToObjectReader {
 
     return items;
   }
+
+  static findStockItemByName(stockName) {
+    const items = MarkdownToObjectReader.parseFile("products.md");
+
+    const foundItem = items.filter((item) => item.name === stockName);
+
+    return foundItem;
+  }
 }
 
 export default MarkdownToObjectReader;

@@ -23,4 +23,18 @@ describe("MarkdownToObjectReader 클래스 테스트", () => {
     ];
     expect(items.slice(0, 5)).toEqual(exampleItem);
   });
+
+  test("상품명을 입력받아 재고에서 해당 상품의 이름, 가격,수량,프로모션 정보 반환", () => {
+    const userStockInfo = ["콜라", 3];
+    const items = MarkdownToObjectReader.parseFile("products.md");
+
+    const foundItem = MarkdownToObjectReader.findStockItemByName("콜라");
+
+    const exampleItem = [
+      { name: "콜라", price: 1000, quantity: 10, promotion: "탄산2+1" },
+      { name: "콜라", price: 1000, quantity: 10, promotion: "null" }
+    ];
+
+    expect(foundItem).toEqual(exampleItem);
+  });
 });
