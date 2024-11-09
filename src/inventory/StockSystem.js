@@ -65,5 +65,3 @@ class StockSystem {
 }
 
 export default StockSystem;
-
-StockSystem.writeFile(["콜라", 3]);

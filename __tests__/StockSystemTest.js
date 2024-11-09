@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import MarkdownToObjectReader from "../src/utils/MarkdownToObjectReader";
+import StockSystem from "../src/inventory/StockSystem.js";
 
 const stockList = [
   {
@@ -35,7 +35,7 @@ describe("stockList 클래스", () => {
   });
 
   test("고객이 상품을 구매할 때마다, 결제된 수량만큼 해당 상품의 재고에서 차감하여 수량을 관리한다.", () => {
-    const items = MarkdownToObjectReader.parseFile("products.md");
+    const items = StockSystem.parseFile("products.md");
     const userInput = ["콜라", 3];
     const orderCount = userInput[1];
     let hasUpdated = false; // 첫 번째 항목만 업데이트할 플래그
@@ -58,8 +58,6 @@ describe("stockList 클래스", () => {
     updatedStock.forEach((item) => {
       markdownContent += `${item.name},${item.price},${item.quantity},${item.promotion}\n`;
     });
-
-    fs.writeFileSync("updatedStock.md", markdownContent, "utf8");
     expect(updatedStock[0].quantity).toBe(7);
   });
 });
