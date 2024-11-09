@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import MarkdownToObjectReader from "../src/utils/MarkdownToObjectReader";
 
 const stockList = [
   {
@@ -34,42 +35,31 @@ describe("stockList 클래스", () => {
   });
 
   test("고객이 상품을 구매할 때마다, 결제된 수량만큼 해당 상품의 재고에서 차감하여 수량을 관리한다.", () => {
+    const items = MarkdownToObjectReader.parseFile("products.md");
     const userInput = ["콜라", 3];
     const orderCount = userInput[1];
-    const updatedStock = stockList.map((stock) => {
-      if (stock.name === userInput[0] && stock.quantity >= orderCount) {
-        return { ...stock, quantity: stock.quantity - orderCount };
+    let hasUpdated = false; // 첫 번째 항목만 업데이트할 플래그
+
+    const updatedStock = items.map((stock) => {
+      if (!hasUpdated && stock.name === userInput[0] && stock.quantity >= orderCount) {
+        hasUpdated = true; // 첫 번째 항목을 업데이트한 후에는 false 유지
+        // promotion 상품 먼저 결제
+        if (stock.promotion !== "null") {
+          return { ...stock, quantity: stock.quantity - orderCount };
+        } else {
+          return { ...stock, quantity: stock.quantity - orderCount };
+        }
       }
       return stock;
     });
-    expect(updatedStock[0].quantity).toBe(7);
-  });
+    console.log(updatedStock);
 
-  test("재고는 `public/products.md`를 통해 관리.", () => {
-    const items = [];
-    const filePath = path.join(__dirname, "../public/products.md");
-
-    const fileStocklistRaw = fs.readFileSync(filePath, "utf-8");
-    const fileStocklist = fileStocklistRaw
-      .trim()
-      .split(/\r?\n/)
-      .map((line) => line.split(","));
-
-    const header = fileStocklist[0]; // 첫 번째 줄 (헤더)
-    const body = fileStocklist.slice(1); // 나머지 부분 (본문)
-
-    body.forEach((item) => {
-      const stockItem = {};
-      header.forEach((key, index) => {
-        if (Number.isNaN(Number(item[index]))) {
-          stockItem[key] = item[index];
-        } else {
-          stockItem[key] = Number(item[index]);
-        }
-      });
-      items.push(stockItem);
+    let markdownContent = "name,price,quantity,promotion\n";
+    updatedStock.forEach((item) => {
+      markdownContent += `${item.name},${item.price},${item.quantity},${item.promotion}\n`;
     });
 
-    expect(items[0]).toEqual(stockList[0]);
+    fs.writeFileSync("updatedStock.md", markdownContent, "utf8");
+    expect(updatedStock[0].quantity).toBe(7);
   });
 });

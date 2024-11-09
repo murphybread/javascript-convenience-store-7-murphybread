@@ -1,12 +1,12 @@
 import DateUtils from "../src/utils/DateUtils";
-import MarkdownToObjectReader from "../src/utils/MarkdownToObjectReader";
+import StockSystem from "../src/inventory/StockSystem.js";
 import path from "path";
 
 class PromotionSystem {
   activePromotions() {
     const today = DateUtils.getKoreaNow();
     const currentKoreaFormattedDate = DateUtils.getKoreaNowFormatted(today);
-    const promtionInfoList = MarkdownToObjectReader.parseFile("promotions.md");
+    const promtionInfoList = StockSystem.parseFile("promotions.md");
     const activePromotions = [];
     promtionInfoList.forEach((promotion) => {
       if (promotion.start_date <= currentKoreaFormattedDate && promotion.end_date >= currentKoreaFormattedDate) {
@@ -23,14 +23,14 @@ describe("PromotionSystem 클래스", () => {
     const today = DateUtils.getKoreaNow();
     const currentKoreaFormattedDate = DateUtils.getKoreaNowFormatted(today);
 
-    const promtionInfoList = MarkdownToObjectReader.parseFile("promotions.md");
+    const promtionInfoList = StockSystem.parseFile("promotions.md");
     const activePromotions = new PromotionSystem().activePromotions();
     expect(activePromotions).toEqual(["탄산2+1", "MD추천상품", "반짝할인"]);
   });
 
   test("프로모션 인되는 물품의 name, price, quantity promotion 반환", () => {
     const userInput = ["콜라", 3];
-    const items = MarkdownToObjectReader.parseFile("products.md");
+    const items = StockSystem.parseFile("products.md");
     const foundItem = items.filter((item) => item.name === userInput[0]);
     const promotionItem = items.filter((item) => item.name === userInput[0] && item.promotion !== "null");
 
@@ -42,7 +42,7 @@ describe("PromotionSystem 클래스", () => {
     ["프로모션 재고가 충분한 경우 프로모션 재고 계산 결과 name, price, quantity, promotion 반환", ["콜라", 3]],
     ["프로모션 재고가 부족하여 일부상품에 대해 정가로 결제함을 알리는 경우", ["콜라", 10]]
   ])("%s케이스의 경우 name, price, quantity, promotion 반환", (caseDescription, userInput) => {
-    const items = MarkdownToObjectReader.parseFile("products.md");
+    const items = StockSystem.parseFile("products.md");
     const foundItem = items.filter((item) => item.name === userInput[0]);
     const promotionItem = items.filter((item) => item.name === userInput[0] && item.promotion !== "null");
 
@@ -67,7 +67,7 @@ describe("PromotionSystem 클래스", () => {
 
   test("추가 구매를 통해 프로모션 상품 구입이 가능한 경우 안내", () => {
     const userInput = ["오렌지주스", 1];
-    const items = MarkdownToObjectReader.parseFile("products.md");
+    const items = StockSystem.parseFile("products.md");
     const foundItem = items.filter((item) => item.name === userInput[0]);
     const promotionItem = items.filter((item) => item.name === userInput[0] && item.promotion !== "null");
     //  프로모션 상품의 수량이 1개이상, 해당 프로모션 종류가 있는 경우
