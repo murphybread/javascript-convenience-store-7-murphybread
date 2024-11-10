@@ -20,10 +20,10 @@ class App {
 
       const input = await InputView.readItem();
       const inputList = this.inputView.parseUserInput(input);
-      inputList.forEach((input) => {
-        this.stockSystem.calculateTotalPrice(input[0], input[1]);
+      for (const input of inputList) {
+        await this.stockSystem.calculateTotalPrice(input[0], input[1]);
         this.stockSystem.writeUpdatedStockToFile(input[0], input[1]);
-      });
+      }
 
       await InputView.requestMembershipDiscount(this.stockSystem.normalPrice);
       await StockSystem.initializeTestMd();

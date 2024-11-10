@@ -86,30 +86,60 @@ class StockSystem {
     fs.writeFileSync(filePath, markdownContent, "utf8");
   }
 
-  calculateTotalPrice(stockName, stockQuantity) {
+  static async checkPromotionAvailable(promotionSaleItemInfo, requestStockQuantity) {
+    // 프로모션 조건 확인
+    if (promotionSaleItemInfo[0].promotion === "MD추천상품" || promotionSaleItemInfo[0].promotion === "반짝할인") {
+      console.log(`Promotion Info: ${promotionSaleItemInfo[0].promotion}, Requested Quantity: ${requestStockQuantity}`);
+      if (requestStockQuantity % 2 === 1) {
+        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`);
+
+        if (userPromoAnswer.toLowerCase() === "y") {
+          const promotionGift = [{ ...promotionSaleItemInfo[0], quantity: 1 }];
+          console.log(`promotionGift ${JSON.stringify(promotionGift, null, 2)}`);
+          return promotionGift;
+        }
+      }
+    }
+
+    if (promotionSaleItemInfo[0].promotion === "탄산2+1") {
+      if (requestStockQuantity % 3 === 2) {
+        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`);
+        if (userPromoAnswer.toLowerCase() === "y") {
+          const promotionGift = [{ ...promotionSaleItemInfo[0], quantity: 1 }];
+          console.log(`promotionGift ${JSON.stringify(promotionGift, null, 2)}`);
+          return promotionGift;
+        }
+      }
+    }
+    return null;
+  }
+
+  async calculateTotalPrice(requestStockName, requestStockQuantity) {
     const items = StockSystem.parseFile(TEST_FILE);
 
     // 먼저 재고가 존재하는지 확인
-    const findStockItemInfo = StockSystem.findStockItemByName(stockName, stockQuantity);
+    const findStockItemInfo = StockSystem.findStockItemByName(requestStockName, requestStockQuantity);
     if (findStockItemInfo.length === 0) {
       MissionUtils.Console.print("재고가 부족합니다.");
 
       return InputView.readItem();
     }
     // 프로모션 재고가 있는 경우 프로모션재고반환 없는 경우 일반 재고 정보 반환
-    const promotionSaleItemInfo = StockSystem.findPromotionItemByName(stockName, stockQuantity);
-    const normalSaleItemInfo = StockSystem.findNormalItemByName(stockName, stockQuantity);
+    const promotionSaleItemInfo = StockSystem.findPromotionItemByName(requestStockName, requestStockQuantity);
+    const normalSaleItemInfo = StockSystem.findNormalItemByName(requestStockName, requestStockQuantity);
 
     console.log(`promotionSaleItemInfo ${JSON.stringify(promotionSaleItemInfo, null, 2)}`);
     console.log(`normalSaleItemInfo ${JSON.stringify(normalSaleItemInfo, null, 2)}`);
 
     if (promotionSaleItemInfo.length > 0) {
-      promotionSaleItemInfo.forEach((stock) => {
-        this.promtionPrice += stock.price * stockQuantity;
-      });
+      for (const stock of promotionSaleItemInfo) {
+        // 프로모션 체크 추가. 프로모션재고가 있는데 고객이 해당 수량보다 적게가져온경우
+        const promotionGift = await StockSystem.checkPromotionAvailable(promotionSaleItemInfo, requestStockQuantity);
+        this.promtionPrice += stock.price * requestStockQuantity;
+      }
     } else {
       normalSaleItemInfo.forEach((stock) => {
-        this.normalPrice += stock.price * stockQuantity;
+        this.normalPrice += stock.price * requestStockQuantity;
       });
     }
 
