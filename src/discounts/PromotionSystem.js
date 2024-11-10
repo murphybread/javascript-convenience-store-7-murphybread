@@ -15,6 +15,13 @@ class PromotionSystem {
 
     return activePromotions;
   }
+  findPromotionItemByName(stockName, stockQuantity) {
+    const items = StockSystem.parseFile("products.md");
+    const foundItem = items.filter((item) => item.name === stockName && item.quantity >= stockQuantity);
+    const promotionItem = items.filter((item) => item.name === stockName && item.promotion !== "null");
+
+    return promotionItem;
+  }
 }
 
 export default PromotionSystem;
