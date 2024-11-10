@@ -49,19 +49,19 @@ class StockSystem {
 
   static findStockItemByName(stockName, stockQuantity) {
     const items = StockSystem.parseFile("products.md");
-    const foundItem = items.filter((item) => item.name === stockName && item.quantity >= stockQuantity);
+    const foundItem = items.filter((item) => item.name === stockName && item.quantity > 0);
     return foundItem;
   }
 
   static findPromotionItemByName(stockName, stockQuantity) {
     const items = StockSystem.parseFile("products.md");
-    const promotionItems = items.filter((item) => item.name === stockName && item.quantity >= stockQuantity && item.promotion !== "null");
+    const promotionItems = items.filter((item) => item.name === stockName && item.quantity > 0 && item.promotion !== "null");
     return promotionItems;
   }
 
   static findNormalItemByName(stockName, stockQuantity) {
     const items = StockSystem.parseFile("products.md");
-    const promotionItems = items.filter((item) => item.name === stockName && item.quantity >= stockQuantity && item.promotion === "null");
+    const promotionItems = items.filter((item) => item.name === stockName && item.quantity > 0 && item.promotion === "null");
     return promotionItems;
   }
 
@@ -69,11 +69,13 @@ class StockSystem {
   writeUpdatedStockToFile(stockName, stockQuantity) {
     const items = StockSystem.parseFile(TEST_FILE);
     const filePath = path.join(StockSystem.#directoryPath, TEST_FILE);
+    let purchasedStock = {};
     let hasUpdated = false;
 
     const updatedStock = items.map((stock) => {
       if (!hasUpdated && stock.name === stockName && stock.quantity >= stockQuantity) {
         hasUpdated = true;
+        purchasedStock = { ...stock, quantity: stockQuantity };
         return { ...stock, quantity: stock.quantity - stockQuantity };
       }
       return stock;
@@ -84,6 +86,7 @@ class StockSystem {
     });
 
     fs.writeFileSync(filePath, markdownContent, "utf8");
+    return purchasedStock;
   }
 
   async checkPromotionAvailable(promotionSaleItemInfo, requestStockQuantity) {
@@ -116,35 +119,40 @@ class StockSystem {
 
     // 먼저 재고가 존재하는지 확인
     const findStockItemInfo = StockSystem.findStockItemByName(requestStockName, requestStockQuantity);
+    const findPromotionSaleItemInfo = StockSystem.findPromotionItemByName(requestStockName, requestStockQuantity);
+    const findNormalSaleItemInfo = StockSystem.findNormalItemByName(requestStockName, requestStockQuantity);
+
     if (findStockItemInfo.length === 0) {
       MissionUtils.Console.print("재고가 부족합니다.");
 
       return InputView.readItem();
     }
+    console.log(`Find findStockItemInfo ${JSON.stringify(findStockItemInfo, null, 2)}`);
+    console.log(`Find promotionSaleItemInfo ${JSON.stringify(findPromotionSaleItemInfo, null, 2)}`);
+    console.log(`Find normalSaleItemInfo ${JSON.stringify(findNormalSaleItemInfo, null, 2)}`);
+
     // 프로모션 재고가 있는 경우 프로모션재고반환 없는 경우 일반 재고 정보 반환
-    const promotionSaleItemInfo = StockSystem.findPromotionItemByName(requestStockName, requestStockQuantity);
-    const normalSaleItemInfo = StockSystem.findNormalItemByName(requestStockName, requestStockQuantity);
-
-    console.log(`promotionSaleItemInfo ${JSON.stringify(promotionSaleItemInfo, null, 2)}`);
-    console.log(`normalSaleItemInfo ${JSON.stringify(normalSaleItemInfo, null, 2)}`);
-
-    if (promotionSaleItemInfo.length > 0) {
-      for (const stock of promotionSaleItemInfo) {
+    let promotionSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
+    let normalSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
+    let totalSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
+    if (findPromotionSaleItemInfo.length > 0) {
+      for (const stock of findPromotionSaleItemInfo) {
         // 프로모션 체크 추가. 프로모션재고가 있는데 고객이 해당 수량보다 적게가져온경우
-        const additionalQuantity = await this.checkPromotionAvailable(promotionSaleItemInfo, requestStockQuantity);
-        this.promtionPrice += stock.price * (requestStockQuantity + additionalQuantity);
+        const additionalQuantity = await this.checkPromotionAvailable(findPromotionSaleItemInfo, requestStockQuantity);
+        promotionSaleItemInfo = { ...promotionSaleItemInfo, quantity: Math.min(findPromotionSaleItemInfo[0].quantity, requestStockQuantity) + additionalQuantity };
       }
     } else {
-      normalSaleItemInfo.forEach((stock) => {
-        this.normalPrice += stock.price * requestStockQuantity;
-      });
+      // 프로모션 재고가 없는 경우 mock데이터 작성
+      promotionSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
+    }
+    // 프로모션 재고로 불충분 한 경우 일반 재고 소모
+    if (promotionSaleItemInfo.quantity < requestStockQuantity) {
+      normalSaleItemInfo = { ...findNormalSaleItemInfo[0], quantity: requestStockQuantity - promotionSaleItemInfo.quantity };
     }
 
-    this.totalPrice += this.normalPrice + this.promtionPrice;
+    totalSaleItemInfo = { ...totalSaleItemInfo, quantity: promotionSaleItemInfo.quantity + normalSaleItemInfo.quantity };
 
-    console.log(`this.totalPrice ${this.totalPrice} , this.normalPrice ${this.normalPrice} , this.promtionPrice ${this.promtionPrice}`);
-
-    return [this.totalPrice, this.normalPrice, this.promtionPrice];
+    return [totalSaleItemInfo, promotionSaleItemInfo, normalSaleItemInfo];
   }
 
   static async initializeTestMd() {
