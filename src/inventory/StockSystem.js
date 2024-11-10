@@ -6,6 +6,8 @@ import PromotionSystem from "../discounts/PromotionSystem.js";
 import InputView from "../view/InputView.js";
 import { MissionUtils } from "@woowacourse/mission-utils";
 
+const TEST_FILE = "test.md";
+
 class StockSystem {
   static #directoryPath = DIRECTORY_PATH;
 
@@ -65,29 +67,8 @@ class StockSystem {
 
   // 실제 원본 products.md수정
   writeUpdatedStockToFile(stockName, stockQuantity) {
-    const items = StockSystem.parseFile("products.md");
-    const filePath = path.join(StockSystem.#directoryPath, "test.md");
-    let hasUpdated = false;
-
-    const updatedStock = items.map((stock) => {
-      if (!hasUpdated && stock.name === stockName && stock.quantity >= stockQuantity) {
-        hasUpdated = true;
-        return { ...stock, quantity: stock.quantity - stockQuantity };
-      }
-      return stock;
-    });
-    let markdownContent = "name,price,quantity,promotion\n";
-    updatedStock.forEach((item) => {
-      markdownContent += `${item.name},${item.price},${item.quantity},${item.promotion}\n`;
-    });
-
-    fs.writeFileSync(filePath, markdownContent, "utf8");
-  }
-
-  // test용 test.md만 수정
-  testwriteUpdatedStockToFile(stockName, stockQuantity) {
-    const items = StockSystem.parseFile("test.md");
-    const filePath = path.join(StockSystem.#directoryPath, "test.md");
+    const items = StockSystem.parseFile(TEST_FILE);
+    const filePath = path.join(StockSystem.#directoryPath, TEST_FILE);
     let hasUpdated = false;
 
     const updatedStock = items.map((stock) => {
@@ -106,7 +87,7 @@ class StockSystem {
   }
 
   calculateTotalPrice(stockName, stockQuantity) {
-    const items = StockSystem.parseFile("products.md");
+    const items = StockSystem.parseFile(TEST_FILE);
 
     // 먼저 재고가 존재하는지 확인
     const findStockItemInfo = StockSystem.findStockItemByName(stockName, stockQuantity);
@@ -143,7 +124,7 @@ class StockSystem {
     const initializeAnwser = await MissionUtils.Console.readLineAsync("\ntest.md를 초기화 할까요?");
     if (MEMBERSHIP_STATUS[initializeAnwser]) {
       const items = StockSystem.parseFile("products.md");
-      const filePath = path.join(StockSystem.#directoryPath, "test.md");
+      const filePath = path.join(StockSystem.#directoryPath, TEST_FILE);
       let markdownContent = "name,price,quantity,promotion\n";
       items.forEach((item) => {
         markdownContent += `${item.name},${item.price},${item.quantity},${item.promotion}\n`;
