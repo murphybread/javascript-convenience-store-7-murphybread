@@ -1,6 +1,10 @@
 import fs from "fs";
 import path from "path";
 import { DIRECTORY_PATH } from "../config/constants.js";
+import MembershipDiscount from "../discounts/MembershipDiscount.js";
+import PromotionSystem from "../discounts/PromotionSystem.js";
+import InputView from "../view/InputView.js";
+import { MissionUtils } from "@woowacourse/mission-utils";
 
 class StockSystem {
   static #directoryPath = DIRECTORY_PATH;
@@ -35,10 +39,10 @@ class StockSystem {
     return items;
   }
 
-  static findStockItemByName(stockName) {
-    const items = MarkdownToObjectReader.parseFile("products.md");
+  static findStockItemByName(stockName, stockQuantity) {
+    const items = StockSystem.parseFile("products.md");
 
-    const foundItem = items.filter((item) => item.name === stockName);
+    const foundItem = items.filter((item) => item.name === stockName && item.quantity >= stockQuantity);
 
     return foundItem;
   }
@@ -61,6 +65,27 @@ class StockSystem {
     });
 
     fs.writeFileSync(filePath, markdownContent, "utf8");
+  }
+
+  static calculateTotalPrice(stockName, stockQuantity) {
+    const items = this.parseFile("products.md");
+    let totalPrice = 0;
+
+    // 먼저 재고가 존재하는지 확인
+    const stockExists = this.findStockItemByName(stockName, stockQuantity);
+    if (stockExists.length === 0) {
+      MissionUtils.Console.print("재고가 부족합니다.");
+
+      return InputView.readItem();
+    }
+
+    items.forEach((stock) => {
+      if (stock.name === stockName) {
+        totalPrice = stock.price * stockQuantity;
+      }
+    });
+
+    return totalPrice;
   }
 }
 

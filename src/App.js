@@ -1,5 +1,6 @@
 import OuputView from "./view/OutputView.js";
 import InputView from "./view/InputView.js";
+import StockSystem from "./inventory/Stocksystem.js";
 
 class App {
   constructor() {
@@ -10,8 +11,10 @@ class App {
   async run() {
     this.outputView.printIntroduction();
     this.outputView.printProducts();
-    const input = await this.inputView.readItem();
-    console.log(this.inputView.parseUserInput(input));
+
+    const input = await InputView.readItem();
+    const inputList = this.inputView.parseUserInput(input);
+    StockSystem.calculateTotalPrice(inputList[0], inputList[1]);
   }
 }
 
