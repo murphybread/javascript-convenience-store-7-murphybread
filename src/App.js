@@ -18,9 +18,11 @@ class App {
     const inputList = this.inputView.parseUserInput(input);
     inputList.forEach((input) => {
       this.stockSystem.calculateTotalPrice(input[0], input[1]);
+      this.stockSystem.testwriteUpdatedStockToFile(input[0], input[1]);
     });
 
-    InputView.requestMembershipDiscount(this.stockSystem.normalPrice);
+    await InputView.requestMembershipDiscount(this.stockSystem.normalPrice);
+    await StockSystem.initializeTestMd();
   }
 }
 

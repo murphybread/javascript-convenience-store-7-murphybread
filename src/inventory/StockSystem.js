@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { DIRECTORY_PATH } from "../config/constants.js";
+import { DIRECTORY_PATH, MEMBERSHIP_STATUS } from "../config/constants.js";
 import MembershipDiscount from "../discounts/MembershipDiscount.js";
 import PromotionSystem from "../discounts/PromotionSystem.js";
 import InputView from "../view/InputView.js";
@@ -63,15 +63,37 @@ class StockSystem {
     return promotionItems;
   }
 
-  static writeFile(userInput) {
+  // 실제 원본 products.md수정
+  writeUpdatedStockToFile(stockName, stockQuantity) {
     const items = StockSystem.parseFile("products.md");
-    const filePath = path.join(this.#directoryPath, "test.md");
+    const filePath = path.join(StockSystem.#directoryPath, "test.md");
     let hasUpdated = false;
 
     const updatedStock = items.map((stock) => {
-      if (!hasUpdated && stock.name === userInput[0] && stock.quantity >= userInput[1]) {
+      if (!hasUpdated && stock.name === stockName && stock.quantity >= stockQuantity) {
         hasUpdated = true;
-        return { ...stock, quantity: stock.quantity - userInput[1] };
+        return { ...stock, quantity: stock.quantity - stockQuantity };
+      }
+      return stock;
+    });
+    let markdownContent = "name,price,quantity,promotion\n";
+    updatedStock.forEach((item) => {
+      markdownContent += `${item.name},${item.price},${item.quantity},${item.promotion}\n`;
+    });
+
+    fs.writeFileSync(filePath, markdownContent, "utf8");
+  }
+
+  // test용 test.md만 수정
+  testwriteUpdatedStockToFile(stockName, stockQuantity) {
+    const items = StockSystem.parseFile("test.md");
+    const filePath = path.join(StockSystem.#directoryPath, "test.md");
+    let hasUpdated = false;
+
+    const updatedStock = items.map((stock) => {
+      if (!hasUpdated && stock.name === stockName && stock.quantity >= stockQuantity) {
+        hasUpdated = true;
+        return { ...stock, quantity: stock.quantity - stockQuantity };
       }
       return stock;
     });
@@ -115,6 +137,19 @@ class StockSystem {
     console.log(`this.totalPrice ${this.totalPrice} , this.normalPrice ${this.normalPrice} , this.promtionPrice ${this.promtionPrice}`);
 
     return [this.totalPrice, this.normalPrice, this.promtionPrice];
+  }
+
+  static async initializeTestMd() {
+    const initializeAnwser = await MissionUtils.Console.readLineAsync("\ntest.md를 초기화 할까요?");
+    if (MEMBERSHIP_STATUS[initializeAnwser]) {
+      const items = StockSystem.parseFile("products.md");
+      const filePath = path.join(StockSystem.#directoryPath, "test.md");
+      let markdownContent = "name,price,quantity,promotion\n";
+      items.forEach((item) => {
+        markdownContent += `${item.name},${item.price},${item.quantity},${item.promotion}\n`;
+      });
+      fs.writeFileSync(filePath, markdownContent, "utf8");
+    }
   }
 }
 
