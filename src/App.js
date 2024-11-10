@@ -20,7 +20,7 @@ class App {
       this.stockSystem.calculateTotalPrice(input[0], input[1]);
     });
 
-    InputView.requestMembershipDiscount(this.stockSystem.totalPrice);
+    InputView.requestMembershipDiscount(this.stockSystem.normalPrice);
   }
 }
 

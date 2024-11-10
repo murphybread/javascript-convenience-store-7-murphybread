@@ -13,6 +13,8 @@ class StockSystem {
     this.promotionSystem = new PromotionSystem();
     this.membershipDiscount = new MembershipDiscount();
     this.totalPrice = 0;
+    this.normalPrice = 0;
+    this.promtionPrice = 0;
   }
   static parseFile(fileName) {
     const items = [];
@@ -98,13 +100,21 @@ class StockSystem {
     console.log(`promotionSaleItemInfo ${JSON.stringify(promotionSaleItemInfo, null, 2)}`);
     console.log(`normalSaleItemInfo ${JSON.stringify(normalSaleItemInfo, null, 2)}`);
 
-    items.forEach((stock) => {
-      if (stock.name === stockName) {
-        this.totalPrice += stock.price * stockQuantity;
-      }
-    });
+    if (promotionSaleItemInfo.length > 0) {
+      promotionSaleItemInfo.forEach((stock) => {
+        this.promtionPrice += stock.price * stockQuantity;
+      });
+    } else {
+      normalSaleItemInfo.forEach((stock) => {
+        this.normalPrice += stock.price * stockQuantity;
+      });
+    }
 
-    return this.totalPrice;
+    this.totalPrice += this.normalPrice + this.promtionPrice;
+
+    console.log(`this.totalPrice ${this.totalPrice} , this.normalPrice ${this.normalPrice} , this.promtionPrice ${this.promtionPrice}`);
+
+    return [this.totalPrice, this.normalPrice, this.promtionPrice];
   }
 }
 
