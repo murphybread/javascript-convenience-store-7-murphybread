@@ -86,32 +86,29 @@ class StockSystem {
     fs.writeFileSync(filePath, markdownContent, "utf8");
   }
 
-  static async checkPromotionAvailable(promotionSaleItemInfo, requestStockQuantity) {
+  async checkPromotionAvailable(promotionSaleItemInfo, requestStockQuantity) {
     // 프로모션 조건 확인
     if (promotionSaleItemInfo[0].promotion === "MD추천상품" || promotionSaleItemInfo[0].promotion === "반짝할인") {
       console.log(`Promotion Info: ${promotionSaleItemInfo[0].promotion}, Requested Quantity: ${requestStockQuantity}`);
       if (requestStockQuantity % 2 === 1) {
-        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`);
+        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)\n`);
 
         if (userPromoAnswer.toLowerCase() === "y") {
-          const promotionGift = [{ ...promotionSaleItemInfo[0], quantity: 1 }];
-          console.log(`promotionGift ${JSON.stringify(promotionGift, null, 2)}`);
-          return promotionGift;
+          return 1;
         }
       }
+      return 0;
     }
 
     if (promotionSaleItemInfo[0].promotion === "탄산2+1") {
       if (requestStockQuantity % 3 === 2) {
         const userPromoAnswer = await MissionUtils.Console.readLineAsync(`현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`);
         if (userPromoAnswer.toLowerCase() === "y") {
-          const promotionGift = [{ ...promotionSaleItemInfo[0], quantity: 1 }];
-          console.log(`promotionGift ${JSON.stringify(promotionGift, null, 2)}`);
-          return promotionGift;
+          return 1;
         }
       }
     }
-    return null;
+    return 0;
   }
 
   async calculateTotalPrice(requestStockName, requestStockQuantity) {
@@ -134,8 +131,8 @@ class StockSystem {
     if (promotionSaleItemInfo.length > 0) {
       for (const stock of promotionSaleItemInfo) {
         // 프로모션 체크 추가. 프로모션재고가 있는데 고객이 해당 수량보다 적게가져온경우
-        const promotionGift = await StockSystem.checkPromotionAvailable(promotionSaleItemInfo, requestStockQuantity);
-        this.promtionPrice += stock.price * requestStockQuantity;
+        const additionalQuantity = await this.checkPromotionAvailable(promotionSaleItemInfo, requestStockQuantity);
+        this.promtionPrice += stock.price * (requestStockQuantity + additionalQuantity);
       }
     } else {
       normalSaleItemInfo.forEach((stock) => {
