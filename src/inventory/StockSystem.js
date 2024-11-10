@@ -12,6 +12,7 @@ class StockSystem {
   constructor() {
     this.promotionSystem = new PromotionSystem();
     this.membershipDiscount = new MembershipDiscount();
+    this.totalPrice = 0;
   }
   static parseFile(fileName) {
     const items = [];
@@ -61,7 +62,7 @@ class StockSystem {
   }
 
   static writeFile(userInput) {
-    const items = this.parseFile("products.md");
+    const items = StockSystem.parseFile("products.md");
     const filePath = path.join(this.#directoryPath, "test.md");
     let hasUpdated = false;
 
@@ -80,30 +81,30 @@ class StockSystem {
     fs.writeFileSync(filePath, markdownContent, "utf8");
   }
 
-  static calculateTotalPrice(stockName, stockQuantity) {
-    const items = this.parseFile("products.md");
-    let totalPrice = 0;
+  calculateTotalPrice(stockName, stockQuantity) {
+    const items = StockSystem.parseFile("products.md");
 
     // 먼저 재고가 존재하는지 확인
-    const findStockItemInfo = this.findStockItemByName(stockName, stockQuantity);
+    const findStockItemInfo = StockSystem.findStockItemByName(stockName, stockQuantity);
     if (findStockItemInfo.length === 0) {
       MissionUtils.Console.print("재고가 부족합니다.");
 
       return InputView.readItem();
     }
     // 프로모션 재고가 있는 경우 프로모션재고반환 없는 경우 일반 재고 정보 반환
-    const promotionSaleItemInfo = this.findPromotionItemByName(stockName, stockQuantity);
-    const normalSaleItemInfo = this.findNormalItemByName(stockName, stockQuantity);
+    const promotionSaleItemInfo = StockSystem.findPromotionItemByName(stockName, stockQuantity);
+    const normalSaleItemInfo = StockSystem.findNormalItemByName(stockName, stockQuantity);
 
     console.log(`promotionSaleItemInfo ${JSON.stringify(promotionSaleItemInfo, null, 2)}`);
     console.log(`normalSaleItemInfo ${JSON.stringify(normalSaleItemInfo, null, 2)}`);
+
     items.forEach((stock) => {
       if (stock.name === stockName) {
-        totalPrice = stock.price * stockQuantity;
+        this.totalPrice += stock.price * stockQuantity;
       }
     });
 
-    return totalPrice;
+    return this.totalPrice;
   }
 }
 

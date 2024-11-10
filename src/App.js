@@ -1,11 +1,13 @@
 import OuputView from "./view/OutputView.js";
 import InputView from "./view/InputView.js";
 import StockSystem from "./inventory/Stocksystem.js";
+import MembershipDiscount from "./discounts/MembershipDiscount.js";
 
 class App {
   constructor() {
     this.outputView = new OuputView();
     this.inputView = new InputView();
+    this.stockSystem = new StockSystem();
   }
 
   async run() {
@@ -14,7 +16,11 @@ class App {
 
     const input = await InputView.readItem();
     const inputList = this.inputView.parseUserInput(input);
-    StockSystem.calculateTotalPrice(inputList[0], inputList[1]);
+    inputList.forEach((input) => {
+      this.stockSystem.calculateTotalPrice(input[0], input[1]);
+    });
+
+    InputView.requestMembershipDiscount(this.stockSystem.totalPrice);
   }
 }
 
