@@ -9,7 +9,10 @@ import { MissionUtils } from "@woowacourse/mission-utils";
 class StockSystem {
   static #directoryPath = DIRECTORY_PATH;
 
-  constructor() {}
+  constructor() {
+    this.promotionSystem = new PromotionSystem();
+    this.membershipDiscount = new MembershipDiscount();
+  }
   static parseFile(fileName) {
     const items = [];
     const filePath = path.join(this.#directoryPath, fileName);
@@ -41,10 +44,20 @@ class StockSystem {
 
   static findStockItemByName(stockName, stockQuantity) {
     const items = StockSystem.parseFile("products.md");
-
     const foundItem = items.filter((item) => item.name === stockName && item.quantity >= stockQuantity);
-
     return foundItem;
+  }
+
+  static findPromotionItemByName(stockName, stockQuantity) {
+    const items = StockSystem.parseFile("products.md");
+    const promotionItems = items.filter((item) => item.name === stockName && item.quantity >= stockQuantity && item.promotion !== "null");
+    return promotionItems;
+  }
+
+  static findNormalItemByName(stockName, stockQuantity) {
+    const items = StockSystem.parseFile("products.md");
+    const promotionItems = items.filter((item) => item.name === stockName && item.quantity >= stockQuantity && item.promotion === "null");
+    return promotionItems;
   }
 
   static writeFile(userInput) {
@@ -72,13 +85,18 @@ class StockSystem {
     let totalPrice = 0;
 
     // 먼저 재고가 존재하는지 확인
-    const stockExists = this.findStockItemByName(stockName, stockQuantity);
-    if (stockExists.length === 0) {
+    const findStockItemInfo = this.findStockItemByName(stockName, stockQuantity);
+    if (findStockItemInfo.length === 0) {
       MissionUtils.Console.print("재고가 부족합니다.");
 
       return InputView.readItem();
     }
+    // 프로모션 재고가 있는 경우 프로모션재고반환 없는 경우 일반 재고 정보 반환
+    const promotionSaleItemInfo = this.findPromotionItemByName(stockName, stockQuantity);
+    const normalSaleItemInfo = this.findNormalItemByName(stockName, stockQuantity);
 
+    console.log(`promotionSaleItemInfo ${JSON.stringify(promotionSaleItemInfo, null, 2)}`);
+    console.log(`normalSaleItemInfo ${JSON.stringify(normalSaleItemInfo, null, 2)}`);
     items.forEach((stock) => {
       if (stock.name === stockName) {
         totalPrice = stock.price * stockQuantity;
