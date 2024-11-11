@@ -7,9 +7,13 @@ class MembershipDiscount {
     return this.active;
   }
 
-  calculateDiscount(price) {
+  calculateDiscount(normalStockList) {
+    let normalPrice = 0;
     if (this.active) {
-      return Math.min(price * 0.3, 8000);
+      for (let stock of normalStockList) {
+        normalPrice += stock.price * stock.quantity;
+      }
+      return Math.min(normalPrice * 0.3, 8000);
     }
     return 0;
   }
