@@ -28,8 +28,6 @@ class App {
 
       // 멤버십 할인 요청
       await InputView.requestMembershipDiscount(this.stockSystem.totalStockList);
-      await StockSystem.initializeTestMd();
-
       // 영수증 출력
       this.outputView.printReceipt(this.stockSystem.totalStockList, this.stockSystem.normalStockList, this.stockSystem.promotionStockList, this.stockSystem.promotionGiftList);
 

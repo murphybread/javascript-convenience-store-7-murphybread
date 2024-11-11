@@ -178,19 +178,6 @@ class StockSystem {
 
     return [totalSaleItemInfo, normalSaleItemInfo, promotionSaleItemInfo, promotionGift];
   }
-
-  static async initializeTestMd() {
-    const initializeAnwser = await MissionUtils.Console.readLineAsync("\ntest.md를 초기화 할까요?");
-    if (MEMBERSHIP_STATUS[initializeAnwser]) {
-      const items = StockSystem.parseFile("products.md");
-      const filePath = path.join(StockSystem.#directoryPath, TEST_FILE);
-      let markdownContent = "name,price,quantity,promotion\n";
-      items.forEach((item) => {
-        markdownContent += `${item.name},${item.price},${item.quantity},${item.promotion}\n`;
-      });
-      fs.writeFileSync(filePath, markdownContent, "utf8");
-    }
-  }
 }
 
 export default StockSystem;
