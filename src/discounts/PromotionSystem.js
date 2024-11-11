@@ -1,5 +1,5 @@
 import DateUtils from "../utils/DateUtils.js";
-import StockSystem from "../inventory/Stocksystem.js";
+import StockSystem from "../inventory/StockSystem.js";
 
 class PromotionSystem {
   getActivePromotions() {

@@ -1,6 +1,6 @@
 import OutputView from "./view/OutputView.js";
 import InputView from "./view/InputView.js";
-import StockSystem from "./inventory/Stocksystem.js";
+import StockSystem from "./inventory/StockSystem.js";
 import MembershipDiscount from "./discounts/MembershipDiscount.js";
 import { MissionUtils } from "@woowacourse/mission-utils";
 
