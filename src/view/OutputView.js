@@ -78,10 +78,19 @@ class OutputView {
     let promotionQuantity = 0;
 
     const flatTotalStockList = totalStockList.flat();
+    const mergedStockList = totalStockList.flat().reduce((acc, stock) => {
+      const existingItem = acc.find((item) => item.name === stock.name && item.price === stock.price);
+      if (existingItem) {
+        existingItem.quantity += stock.quantity;
+      } else {
+        acc.push({ ...stock });
+      }
+      return acc;
+    }, []);
 
     OutputView.centerText("W 편의점");
     OutputView.formatLine("상품", "수량", "금액");
-    for (let stock of flatTotalStockList) {
+    for (let stock of mergedStockList) {
       if (stock && stock.quantity > 0) {
         OutputView.formatLine(stock.name, stock.quantity, stock.price * stock.quantity);
         totalPrice += stock.price * stock.quantity;
