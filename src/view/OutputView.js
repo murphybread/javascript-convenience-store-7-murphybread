@@ -56,6 +56,9 @@ class OutputView {
   }
 
   static formatLine(name, quantity, price) {
+    if (!name || quantity === undefined || isNaN(price)) {
+      return;
+    }
     const centerPosition = 18;
     const secondPosition = 10;
 
@@ -68,7 +71,7 @@ class OutputView {
     MissionUtils.Console.print(formattedString);
   }
 
-  static printReceipt(totalStockList, normalStockList, promotionStockList, promotionGiftList) {
+  static printReceipt(totalStockList, normalStockList, promotionStockList, promotionGiftList, membershipDiscountPrice) {
     let totalPrice = 0;
     let totalQuantity = 0;
     let promotionPrice = 0;
@@ -76,6 +79,7 @@ class OutputView {
 
     OutputView.centerText("W 편의점");
     OutputView.formatLine("상품", "수량", "금액");
+
     for (let stock of totalStockList) {
       OutputView.formatLine(stock.name, stock.quantity, stock.price * stock.quantity);
       totalPrice += stock.price * stock.quantity;
@@ -92,8 +96,8 @@ class OutputView {
     OutputView.centerText("=");
     OutputView.formatLine("총구매액", totalQuantity, totalPrice);
     OutputView.formatLine("행사할인", "", -promotionPrice);
-    OutputView.formatLine("멤버십할인", "", -MembershipDiscount.calculateDiscount(normalStockList));
-    OutputView.formatLine("내실돈", "", totalPrice - promotionPrice - MembershipDiscount.calculateDiscount(normalStockList));
+    OutputView.formatLine("멤버십할인", "", -membershipDiscountPrice);
+    OutputView.formatLine("내실돈", "", totalPrice - promotionPrice - membershipDiscountPrice);
   }
   // ...
 }

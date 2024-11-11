@@ -11,7 +11,9 @@ class MembershipDiscount {
     let normalPrice = 0;
 
     for (let stock of normalStockList) {
-      normalPrice += stock.price * stock.quantity;
+      if (stock && stock.price > 0 && stock.quantity > 0) {
+        normalPrice += stock.price * stock.quantity;
+      }
     }
     return Math.min(normalPrice * 0.3, 8000);
   }

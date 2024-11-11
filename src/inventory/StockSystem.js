@@ -104,11 +104,11 @@ class StockSystem {
     return purchasedStock;
   }
 
-  async checkPromotionAvailable(promotionSaleItemInfo, requestStockQuantity) {
-    // 프로모션 조건 확인
-    if (promotionSaleItemInfo[0].promotion === "MD추천상품" || promotionSaleItemInfo[0].promotion === "반짝할인") {
-      if (requestStockQuantity % 2 === 1) {
-        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`\n현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)\n`);
+  async checkPromotionAvailable(findPromotionSaleItemInfo, requestStockQuantity) {
+    // 추가 요구 개수 프로모션 조건 확인
+    if (findPromotionSaleItemInfo[0].promotion === "MD추천상품" || findPromotionSaleItemInfo[0].promotion === "반짝할인") {
+      if (requestStockQuantity % 2 === 1 && findPromotionSaleItemInfo[0].quantity - requestStockQuantity >= 1) {
+        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`\n현재 ${findPromotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)\n`);
 
         if (userPromoAnswer.toLowerCase() === "y") {
           return 1;
@@ -117,9 +117,9 @@ class StockSystem {
       return 0;
     }
 
-    if (promotionSaleItemInfo[0].promotion === "탄산2+1") {
-      if (requestStockQuantity % 3 === 2) {
-        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`\n현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`);
+    if (findPromotionSaleItemInfo[0].promotion === "탄산2+1") {
+      if (requestStockQuantity % 3 === 2 && findPromotionSaleItemInfo[0].quantity - requestStockQuantity >= 1) {
+        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`\n현재 ${findPromotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`);
         if (userPromoAnswer.toLowerCase() === "y") {
           return 1;
         }
@@ -135,7 +135,7 @@ class StockSystem {
     }
 
     if (promotionSaleItemInfo.promotion === "탄산2+1") {
-      return { ...promotionSaleItemInfo, quantity: promotionSaleItemInfo.quantity / 3 };
+      return { ...promotionSaleItemInfo, quantity: Math.floor(promotionSaleItemInfo.quantity / 3) };
     }
     return 0;
   }
@@ -158,30 +158,50 @@ class StockSystem {
     // 재고수량 확인
     Validator.checkExceedStockQuantity(findStockItemInfo, requestStockQuantity);
 
-    // 프로모션 재고가 있는 경우 프로모션재고반환 없는 경우 일반 재고 정보 반환
-    let promotionSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
-    let promotionGift = { ...findStockItemInfo[0], quantity: 0 };
-    let normalSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
-    let totalSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
-    if (findPromotionSaleItemInfo.length > 0) {
+    // 프로모션 재고가 있는 경우 프로모션 재고반환 없는 경우 일반 재고 정보 반환
+    let promotionSaleItemInfo = [];
+    let promotionSaleQuantity = 0;
+    let promotionGift = 0;
+    let normalSaleItemInfo = [];
+    let totalSaleItemInfoList = [];
+    if (findPromotionSaleItemInfo.length > 0 && findPromotionSaleItemInfo[0].quantity > 0) {
+      // 프로모션 체크 추가. 프로모션재고가 있는데 고객이 해당 수량보다 적게가져온경우
       for (const stock of findPromotionSaleItemInfo) {
-        // 프로모션 체크 추가. 프로모션재고가 있는데 고객이 해당 수량보다 적게가져온경우
         const additionalQuantity = await this.checkPromotionAvailable(findPromotionSaleItemInfo, requestStockQuantity);
-        promotionSaleItemInfo = { ...promotionSaleItemInfo, quantity: Math.min(findPromotionSaleItemInfo[0].quantity, requestStockQuantity) + additionalQuantity };
+        promotionSaleItemInfo = { ...findPromotionSaleItemInfo[0], quantity: Math.min(findPromotionSaleItemInfo[0].quantity, requestStockQuantity) + additionalQuantity };
+        promotionSaleQuantity = promotionSaleItemInfo.quantity;
         promotionGift = this.calculatePromotionGift(promotionSaleItemInfo);
       }
-    } else {
-      // 프로모션 재고가 없는 경우 mock데이터 작성
-      promotionSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
     }
     // 프로모션 재고로 불충분 한 경우 일반 재고 소모
-    if (promotionSaleItemInfo.quantity < requestStockQuantity) {
-      normalSaleItemInfo = { ...findNormalSaleItemInfo[0], quantity: requestStockQuantity - promotionSaleItemInfo.quantity };
+
+    if (promotionSaleQuantity < requestStockQuantity && findNormalSaleItemInfo[0].quantity > 0) {
+      if (promotionSaleItemInfo.promotion === "MD추천상품" || promotionSaleItemInfo.promotion === "반짝할인") {
+        let nonPromotionQuantity = requestStockQuantity - (promotionSaleItemInfo.quantity - (promotionSaleItemInfo.quantity % 2));
+        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`\n현재 ${promotionSaleItemInfo.name} ${nonPromotionQuantity}개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)\n`);
+        if (MEMBERSHIP_STATUS[userPromoAnswer]) {
+          normalSaleItemInfo = { ...findNormalSaleItemInfo[0], quantity: requestStockQuantity - promotionSaleItemInfo.quantity };
+        }
+      }
+
+      if (promotionSaleItemInfo.promotion === "탄산2+1") {
+        let nonPromotionQuantity = requestStockQuantity - (promotionSaleItemInfo.quantity - (promotionSaleItemInfo.quantity % 3));
+        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`\n현재 ${promotionSaleItemInfo.name} ${nonPromotionQuantity}개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)\n`);
+        if (MEMBERSHIP_STATUS[userPromoAnswer]) {
+          normalSaleItemInfo = { ...findNormalSaleItemInfo[0], quantity: requestStockQuantity - promotionSaleItemInfo.quantity };
+        }
+      }
+
+      //프로모션이 없었던 경우
+      if (promotionSaleItemInfo.length === 0) {
+        normalSaleItemInfo = { ...findNormalSaleItemInfo[0], quantity: requestStockQuantity };
+      }
     }
 
-    totalSaleItemInfo = { ...totalSaleItemInfo, quantity: promotionSaleItemInfo.quantity + normalSaleItemInfo.quantity };
+    totalSaleItemInfoList.push(promotionSaleItemInfo);
+    totalSaleItemInfoList.push(normalSaleItemInfo);
 
-    return [totalSaleItemInfo, normalSaleItemInfo, promotionSaleItemInfo, promotionGift];
+    return [totalSaleItemInfoList, normalSaleItemInfo, promotionSaleItemInfo, promotionGift];
   }
 }
 
