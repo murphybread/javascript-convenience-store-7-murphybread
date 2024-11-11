@@ -62,20 +62,20 @@ class StockSystem {
   }
 
   static findStockItemByName(stockName, stockQuantity) {
-    const items = StockSystem.parseFile("products.md");
-    const foundItem = items.filter((item) => item.name === stockName && item.quantity > 0);
+    const items = StockSystem.parseFile(TEST_FILE);
+    const foundItem = items.filter((item) => item.name === stockName);
     return foundItem;
   }
 
   static findPromotionItemByName(stockName, stockQuantity) {
-    const items = StockSystem.parseFile("products.md");
-    const promotionItems = items.filter((item) => item.name === stockName && item.quantity > 0 && item.promotion !== "null");
+    const items = StockSystem.parseFile(TEST_FILE);
+    const promotionItems = items.filter((item) => item.name === stockName && item.promotion !== "null");
     return promotionItems;
   }
 
   static findNormalItemByName(stockName, stockQuantity) {
-    const items = StockSystem.parseFile("products.md");
-    const promotionItems = items.filter((item) => item.name === stockName && item.quantity > 0 && item.promotion === "null");
+    const items = StockSystem.parseFile(TEST_FILE);
+    const promotionItems = items.filter((item) => item.name === stockName && item.promotion === "null");
     return promotionItems;
   }
 
@@ -147,8 +147,9 @@ class StockSystem {
     const findPromotionSaleItemInfo = StockSystem.findPromotionItemByName(requestStockName, requestStockQuantity);
     const findNormalSaleItemInfo = StockSystem.findNormalItemByName(requestStockName, requestStockQuantity);
 
+    // 존재하지 않는 상품을 입력한경우
     if (findStockItemInfo.length === 0) {
-      MissionUtils.Console.print("재고가 부족합니다.");
+      MissionUtils.Console.print("[ERROR] 존재하지 않는 상품입니다. 다시 입력해 주세요.");
 
       return InputView.readItem();
     }
