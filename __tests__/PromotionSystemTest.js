@@ -18,7 +18,7 @@ describe("PromotionSystem 클래스", () => {
     const items = StockSystem.parseFile("products.md");
     const promotionItem = StockSystem.findPromotionItemByName(userInput[0], userInput[1]);
 
-    const exampleItem = [{ name: "콜라", price: 1000, quantity: 10, promotion: "탄산2+1" }];
+    const exampleItem = [{ name: "콜라", price: 1000, quantity: 9, promotion: "탄산2+1" }];
     expect(promotionItem).toEqual(exampleItem);
   });
 

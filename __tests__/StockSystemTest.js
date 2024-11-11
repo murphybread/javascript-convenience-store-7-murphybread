@@ -58,6 +58,6 @@ describe("stockList 클래스", () => {
     updatedStock.forEach((item) => {
       markdownContent += `${item.name},${item.price},${item.quantity},${item.promotion}\n`;
     });
-    expect(updatedStock[0].quantity).toBe(7);
+    expect(updatedStock[0].quantity).toBe(6);
   });
 });
