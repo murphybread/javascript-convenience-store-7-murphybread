@@ -5,6 +5,7 @@ import MembershipDiscount from "../discounts/MembershipDiscount.js";
 import PromotionSystem from "../discounts/PromotionSystem.js";
 import InputView from "../view/InputView.js";
 import { MissionUtils } from "@woowacourse/mission-utils";
+import Validator from "../utils/Validator.js";
 
 class StockSystem {
   static #directoryPath = DIRECTORY_PATH;
@@ -153,6 +154,9 @@ class StockSystem {
 
       return InputView.readItem();
     }
+
+    // 재고수량 확인
+    Validator.checkExceedStockQuantity(findStockItemInfo, requestStockQuantity);
 
     // 프로모션 재고가 있는 경우 프로모션재고반환 없는 경우 일반 재고 정보 반환
     let promotionSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
