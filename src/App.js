@@ -32,7 +32,7 @@ class App {
       OutputView.printReceipt(this.stockSystem.totalStockList, this.stockSystem.normalStockList, this.stockSystem.promotionStockList, this.stockSystem.promotionGiftList);
 
       // 사용자에게 다시 실행할지 묻는 부분 추가
-      const continueAnswer = await MissionUtils.Console.readLineAsync("감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)\n");
+      const continueAnswer = await MissionUtils.Console.readLineAsync("\n감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)\n");
 
       this.stockSystem.initializeStockList();
       keepRunning = continueAnswer.toLowerCase() === "y";

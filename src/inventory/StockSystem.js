@@ -19,6 +19,7 @@ class StockSystem {
   }
 
   initializeStockList() {
+    MissionUtils.Console.print("");
     this.totalStockList = [];
     this.normalStockList = [];
     this.promotionStockList = [];
@@ -105,9 +106,8 @@ class StockSystem {
   async checkPromotionAvailable(promotionSaleItemInfo, requestStockQuantity) {
     // 프로모션 조건 확인
     if (promotionSaleItemInfo[0].promotion === "MD추천상품" || promotionSaleItemInfo[0].promotion === "반짝할인") {
-      console.log(`Promotion Info: ${promotionSaleItemInfo[0].promotion}, Requested Quantity: ${requestStockQuantity}`);
       if (requestStockQuantity % 2 === 1) {
-        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)\n`);
+        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`\n현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)\n`);
 
         if (userPromoAnswer.toLowerCase() === "y") {
           return 1;
@@ -118,7 +118,7 @@ class StockSystem {
 
     if (promotionSaleItemInfo[0].promotion === "탄산2+1") {
       if (requestStockQuantity % 3 === 2) {
-        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`);
+        const userPromoAnswer = await MissionUtils.Console.readLineAsync(`\n현재 ${promotionSaleItemInfo[0].name} 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)`);
         if (userPromoAnswer.toLowerCase() === "y") {
           return 1;
         }
