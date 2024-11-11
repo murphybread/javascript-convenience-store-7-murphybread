@@ -9,3 +9,4 @@ export const MEMBERSHIP_STATUS = {
 };
 
 export const DIRECTORY_PATH = path.join(__dirname, "../../public/");
+export const TEST_FILE = "test.md";
