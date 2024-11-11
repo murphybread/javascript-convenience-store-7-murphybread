@@ -1,12 +1,10 @@
 import fs from "fs";
 import path from "path";
-import { DIRECTORY_PATH, MEMBERSHIP_STATUS } from "../config/constants.js";
+import { DIRECTORY_PATH, MEMBERSHIP_STATUS, TEST_FILE } from "../config/constants.js";
 import MembershipDiscount from "../discounts/MembershipDiscount.js";
 import PromotionSystem from "../discounts/PromotionSystem.js";
 import InputView from "../view/InputView.js";
 import { MissionUtils } from "@woowacourse/mission-utils";
-
-const TEST_FILE = "test.md";
 
 class StockSystem {
   static #directoryPath = DIRECTORY_PATH;
@@ -14,9 +12,24 @@ class StockSystem {
   constructor() {
     this.promotionSystem = new PromotionSystem();
     this.membershipDiscount = new MembershipDiscount();
-    this.totalPrice = 0;
-    this.normalPrice = 0;
-    this.promtionPrice = 0;
+    this.totalStockList = [];
+    this.normalStockList = [];
+    this.promotionStockList = [];
+    this.promotionGiftList = [];
+  }
+
+  initializeStockList() {
+    this.totalStockList = [];
+    this.normalStockList = [];
+    this.promotionStockList = [];
+    this.promotionGiftList = [];
+  }
+
+  updateStockList(totalStock, normalStock, promotionStock, promotionGift) {
+    this.totalStockList.push(totalStock);
+    this.normalStockList.push(normalStock);
+    this.promotionStockList.push(promotionStock);
+    this.promotionGiftList.push(promotionGift);
   }
   static parseFile(fileName) {
     const items = [];
@@ -114,6 +127,18 @@ class StockSystem {
     return 0;
   }
 
+  calculatePromotionGift(promotionSaleItemInfo) {
+    // 프로모션 조건 확인
+    if (promotionSaleItemInfo.promotion === "MD추천상품" || promotionSaleItemInfo.promotion === "반짝할인") {
+      return { ...promotionSaleItemInfo, quantity: promotionSaleItemInfo.quantity / 2 };
+    }
+
+    if (promotionSaleItemInfo.promotion === "탄산2+1") {
+      return { ...promotionSaleItemInfo, quantity: promotionSaleItemInfo.quantity / 3 };
+    }
+    return 0;
+  }
+
   async calculateTotalPrice(requestStockName, requestStockQuantity) {
     const items = StockSystem.parseFile(TEST_FILE);
 
@@ -127,12 +152,10 @@ class StockSystem {
 
       return InputView.readItem();
     }
-    console.log(`Find findStockItemInfo ${JSON.stringify(findStockItemInfo, null, 2)}`);
-    console.log(`Find promotionSaleItemInfo ${JSON.stringify(findPromotionSaleItemInfo, null, 2)}`);
-    console.log(`Find normalSaleItemInfo ${JSON.stringify(findNormalSaleItemInfo, null, 2)}`);
 
     // 프로모션 재고가 있는 경우 프로모션재고반환 없는 경우 일반 재고 정보 반환
     let promotionSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
+    let promotionGift = { ...findStockItemInfo[0], quantity: 0 };
     let normalSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
     let totalSaleItemInfo = { ...findStockItemInfo[0], quantity: 0 };
     if (findPromotionSaleItemInfo.length > 0) {
@@ -140,6 +163,7 @@ class StockSystem {
         // 프로모션 체크 추가. 프로모션재고가 있는데 고객이 해당 수량보다 적게가져온경우
         const additionalQuantity = await this.checkPromotionAvailable(findPromotionSaleItemInfo, requestStockQuantity);
         promotionSaleItemInfo = { ...promotionSaleItemInfo, quantity: Math.min(findPromotionSaleItemInfo[0].quantity, requestStockQuantity) + additionalQuantity };
+        promotionGift = this.calculatePromotionGift(promotionSaleItemInfo);
       }
     } else {
       // 프로모션 재고가 없는 경우 mock데이터 작성
@@ -152,7 +176,7 @@ class StockSystem {
 
     totalSaleItemInfo = { ...totalSaleItemInfo, quantity: promotionSaleItemInfo.quantity + normalSaleItemInfo.quantity };
 
-    return [totalSaleItemInfo, promotionSaleItemInfo, normalSaleItemInfo];
+    return [totalSaleItemInfo, normalSaleItemInfo, promotionSaleItemInfo, promotionGift];
   }
 
   static async initializeTestMd() {
