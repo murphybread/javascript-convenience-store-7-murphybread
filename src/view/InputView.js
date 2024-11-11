@@ -16,15 +16,14 @@ class InputView {
     });
   }
 
-  static async requestMembershipDiscount(price) {
+  static async requestMembershipDiscount(normalStockList) {
     const userMembershipAnswer = await MissionUtils.Console.readLineAsync("멤버십 할인을 받으시겠습니까? (Y/N)\n");
     const membership = new MembershipDiscount(MEMBERSHIP_STATUS[userMembershipAnswer]);
 
     if (membership.isActive()) {
-      const discountAmount = membership.calculateDiscount(price);
+      const discountAmount = MembershipDiscount.calculateDiscount(normalStockList);
       return discountAmount;
     } else {
-      console.log("멤버십 할인이 적용되지 않습니다.");
       return 0;
     }
   }
