@@ -81,27 +81,27 @@ class StockSystem {
   }
 
   // 실제 원본 products.md수정
-  writeUpdatedStockToFile(stockName, stockQuantity) {
+  writeUpdatedStockToFile(totalStock) {
     const items = StockSystem.parseFile(TEST_FILE);
     const filePath = path.join(StockSystem.#directoryPath, TEST_FILE);
-    let purchasedStock = {};
-    let hasUpdated = false;
 
-    const updatedStock = items.map((stock) => {
-      if (!hasUpdated && stock.name === stockName && stock.quantity >= stockQuantity) {
-        hasUpdated = true;
-        purchasedStock = { ...stock, quantity: stockQuantity };
-        return { ...stock, quantity: stock.quantity - stockQuantity };
-      }
-      return stock;
-    });
+    let updatedStock = items;
+
+    for (let purchasedStock of totalStock) {
+      updatedStock = updatedStock.map((stock) => {
+        if (stock.name === purchasedStock.name && stock.promotion === purchasedStock.promotion) {
+          return { ...stock, quantity: stock.quantity - purchasedStock.quantity };
+        }
+        return stock;
+      });
+    }
+
     let markdownContent = "name,price,quantity,promotion\n";
     updatedStock.forEach((item) => {
       markdownContent += `${item.name},${item.price},${item.quantity},${item.promotion}\n`;
     });
 
     fs.writeFileSync(filePath, markdownContent, "utf8");
-    return purchasedStock;
   }
 
   async checkPromotionAvailable(findPromotionSaleItemInfo, requestStockQuantity) {

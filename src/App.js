@@ -23,7 +23,7 @@ class App {
       for (const input of inputList) {
         let [totalStock, normalStock, promotionStock, promotionGift] = await this.stockSystem.calculateTotalPrice(input[0], input[1]);
         this.stockSystem.updateStockList(totalStock, normalStock, promotionStock, promotionGift);
-        this.stockSystem.writeUpdatedStockToFile(input[0], input[1]);
+        this.stockSystem.writeUpdatedStockToFile(totalStock);
       }
 
       // 멤버십 할인 요청
