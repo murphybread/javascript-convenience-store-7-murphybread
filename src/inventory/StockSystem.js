@@ -198,9 +198,11 @@ class StockSystem {
       }
     }
 
-    totalSaleItemInfoList.push(promotionSaleItemInfo);
-    totalSaleItemInfoList.push(normalSaleItemInfo);
-
+    [promotionSaleItemInfo, normalSaleItemInfo].forEach((item) => {
+      if (!Array.isArray(item) && Object.keys(item).length > 0) {
+        totalSaleItemInfoList.push(item);
+      }
+    });
     return [totalSaleItemInfoList, normalSaleItemInfo, promotionSaleItemInfo, promotionGift];
   }
 }

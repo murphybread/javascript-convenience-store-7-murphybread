@@ -29,7 +29,7 @@ class App {
       // 멤버십 할인 요청
       const membershipDiscountPrice = await InputView.requestMembershipDiscount(this.stockSystem.normalStockList);
       // 영수증 출력
-      OutputView.printReceipt(this.stockSystem.totalStockList[0], this.stockSystem.normalStockList, this.stockSystem.promotionStockList, this.stockSystem.promotionGiftList, membershipDiscountPrice);
+      OutputView.printReceipt(this.stockSystem.totalStockList, this.stockSystem.normalStockList, this.stockSystem.promotionStockList, this.stockSystem.promotionGiftList, membershipDiscountPrice);
 
       // 사용자에게 다시 실행할지 묻는 부분 추가
       const continueAnswer = await MissionUtils.Console.readLineAsync("\n감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)\n");

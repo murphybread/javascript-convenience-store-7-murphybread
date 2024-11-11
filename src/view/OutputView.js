@@ -77,17 +77,20 @@ class OutputView {
     let promotionPrice = 0;
     let promotionQuantity = 0;
 
+    const flatTotalStockList = totalStockList.flat();
+
     OutputView.centerText("W 편의점");
     OutputView.formatLine("상품", "수량", "금액");
-
-    for (let stock of totalStockList) {
-      OutputView.formatLine(stock.name, stock.quantity, stock.price * stock.quantity);
-      totalPrice += stock.price * stock.quantity;
-      totalQuantity += stock.quantity;
+    for (let stock of flatTotalStockList) {
+      if (stock && stock.quantity > 0) {
+        OutputView.formatLine(stock.name, stock.quantity, stock.price * stock.quantity);
+        totalPrice += stock.price * stock.quantity;
+        totalQuantity += stock.quantity;
+      }
     }
     OutputView.centerText("증    정");
     for (let stock of promotionGiftList) {
-      if (stock.quantity >= 1) {
+      if (stock && stock.quantity > 0) {
         OutputView.formatLine(stock.name, stock.quantity, stock.price * stock.quantity);
         promotionPrice += stock.price * stock.quantity;
         promotionQuantity += stock.quantity;
