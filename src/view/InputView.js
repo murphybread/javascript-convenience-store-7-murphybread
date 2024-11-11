@@ -22,7 +22,6 @@ class InputView {
 
     if (membership.isActive()) {
       const discountAmount = membership.calculateDiscount(price);
-      console.log(`할인 금액: ${discountAmount}`);
       return discountAmount;
     } else {
       console.log("멤버십 할인이 적용되지 않습니다.");
