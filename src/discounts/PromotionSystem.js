@@ -2,7 +2,7 @@ import DateUtils from "../utils/DateUtils.js";
 import StockSystem from "../inventory/Stocksystem.js";
 
 class PromotionSystem {
-  activePromotions() {
+  getActivePromotions() {
     const today = DateUtils.getKoreaNow();
     const currentKoreaFormattedDate = DateUtils.getKoreaNowFormatted(today);
     const promtionInfoList = StockSystem.parseFile("promotions.md");
@@ -16,5 +16,4 @@ class PromotionSystem {
     return activePromotions;
   }
 }
-
 export default PromotionSystem;

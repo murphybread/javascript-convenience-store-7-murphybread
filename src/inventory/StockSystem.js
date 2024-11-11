@@ -70,7 +70,9 @@ class StockSystem {
 
   static findPromotionItemByName(stockName, stockQuantity) {
     const items = StockSystem.parseFile(TEST_FILE);
-    const promotionItems = items.filter((item) => item.name === stockName && item.promotion !== "null");
+    const promotionSystem = new PromotionSystem();
+    const activePromotions = promotionSystem.getActivePromotions();
+    const promotionItems = items.filter((item) => item.name === stockName && activePromotions.includes(item.promotion));
     return promotionItems;
   }
 
