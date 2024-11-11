@@ -36,7 +36,6 @@ class StockSystem {
   static parseFile(fileName) {
     const items = [];
     const filePath = path.join(this.#directoryPath, fileName);
-
     const fileStocklistRaw = fs.readFileSync(filePath, "utf-8");
     const fileStocklist = fileStocklistRaw
       .trim()

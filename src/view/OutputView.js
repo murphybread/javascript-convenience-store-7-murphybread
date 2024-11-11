@@ -1,5 +1,5 @@
 import { MissionUtils } from "@woowacourse/mission-utils";
-import MarkdownToObjectReader from "../utils/MarkdownToObjectReader.js";
+import StockSystem from "../inventory/StockSystem.js";
 import { TEST_FILE } from "../config/constants.js";
 import MembershipDiscount from "../discounts/MembershipDiscount.js";
 
@@ -24,7 +24,7 @@ class OutputView {
   }
 
   printProducts() {
-    const items = MarkdownToObjectReader.parseFile(TEST_FILE);
+    const items = StockSystem.parseFile(TEST_FILE);
     items.forEach((item) => {
       const promotion = this.getPromotion(item.promotion);
       const stockStatus = this.getStockStatus(item.quantity);
