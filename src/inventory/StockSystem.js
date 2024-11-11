@@ -157,7 +157,10 @@ class StockSystem {
     }
 
     // 재고수량 확인
-    Validator.checkExceedStockQuantity(findStockItemInfo, requestStockQuantity);
+    if(!Validator.checkExceedStockQuantity(findStockItemInfo, requestStockQuantity)){
+
+      return [0,0,0,0]
+    }
 
     // 프로모션 재고가 있는 경우 프로모션 재고반환 없는 경우 일반 재고 정보 반환
     let promotionSaleItemInfo = [];

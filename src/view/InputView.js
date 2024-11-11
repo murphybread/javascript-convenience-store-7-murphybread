@@ -8,16 +8,27 @@ class InputView {
     return input;
   }
 
-  parseUserInput(input) {
+  async parseUserInput() {
+    const input = await InputView.readItem();
     const items = input.split(",");
-    Validator.itemFormat(items);
-    return items.map((item) => {
+    if(!Validator.itemFormat(items)){
+      return await this.parseUserInput();
+    }
+    const parsedItems = [];
+    for (const item of items) {
       const cleanedItem = item.replace(/[\[\]\s]/g, "");
-      const [name, quantity] = cleanedItem.split("-");
-      Validator.stockName(name);
-      Validator.number(Number(quantity));
-      return [name, Number(quantity)];
-    });
+      const [name, quantityStr] = cleanedItem.split("-");
+      const quantity = Number(quantityStr);
+      if (!Validator.stockName(name)) {
+        return await this.parseUserInput();
+      }
+      if (!Validator.number(quantity)) {
+        return await this.parseUserInput();
+      }
+      parsedItems.push([name, quantity]);
+    }
+    return parsedItems;
+    
   }
 
   static async requestMembershipDiscount(normalStockList) {

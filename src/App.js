@@ -18,10 +18,14 @@ class App {
       this.outputView.printIntroduction();
       this.outputView.printProducts();
 
-      const input = await InputView.readItem();
-      const inputList = this.inputView.parseUserInput(input);
+     
+      const inputList = await this.inputView.parseUserInput();
       for (const input of inputList) {
         let [totalStock, normalStock, promotionStock, promotionGift] = await this.stockSystem.calculateTotalPrice(input[0], input[1]);
+        if(totalStock === 0){
+          continue;
+          
+        }
         this.stockSystem.updateStockList(totalStock, normalStock, promotionStock, promotionGift);
         this.stockSystem.writeUpdatedStockToFile(totalStock);
       }
