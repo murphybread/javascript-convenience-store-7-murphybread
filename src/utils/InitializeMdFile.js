@@ -1,5 +1,5 @@
 import { MissionUtils } from "@woowacourse/mission-utils";
-import StockSystem from "../inventory/Stocksystem.js";
+import StockSystem from "../inventory/StockSystem.js";
 import { DIRECTORY_PATH, MEMBERSHIP_STATUS, TEST_FILE } from "../config/constants.js";
 import path from "path";
 import fs from "fs";
