@@ -5,7 +5,9 @@ const __dirname = path.dirname(__filename);
 
 export const MEMBERSHIP_STATUS = {
   Y: true,
-  N: false
+  N: false,
+  y: true,
+  n: false
 };
 
 export const DIRECTORY_PATH = path.join(__dirname, "../../public/");
