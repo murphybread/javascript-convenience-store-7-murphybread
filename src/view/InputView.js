@@ -10,11 +10,12 @@ class InputView {
 
   parseUserInput(input) {
     const items = input.split(",");
+    Validator.itemFormat(items);
     return items.map((item) => {
       const cleanedItem = item.replace(/[\[\]\s]/g, "");
       const [name, quantity] = cleanedItem.split("-");
       Validator.stockName(name);
-      Validator.number(quantity);
+      Validator.number(Number(quantity));
       return [name, Number(quantity)];
     });
   }
