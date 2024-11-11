@@ -9,7 +9,7 @@ describe("PromotionSystem 클래스", () => {
     const currentKoreaFormattedDate = DateUtils.getKoreaNowFormatted(today);
 
     const promtionInfoList = StockSystem.parseFile("promotions.md");
-    const activePromotions = new PromotionSystem().activePromotions();
+    const activePromotions = new PromotionSystem().getActivePromotions();
     expect(activePromotions).toEqual(["탄산2+1", "MD추천상품", "반짝할인"]);
   });
 
