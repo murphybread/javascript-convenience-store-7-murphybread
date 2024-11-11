@@ -17,7 +17,7 @@ class InputView {
   }
 
   static async requestMembershipDiscount(normalStockList) {
-    const userMembershipAnswer = await MissionUtils.Console.readLineAsync("멤버십 할인을 받으시겠습니까? (Y/N)\n");
+    const userMembershipAnswer = await MissionUtils.Console.readLineAsync("\n멤버십 할인을 받으시겠습니까? (Y/N)\n");
     const membership = new MembershipDiscount(MEMBERSHIP_STATUS[userMembershipAnswer]);
 
     if (membership.isActive()) {
